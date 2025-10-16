@@ -1,0 +1,78 @@
+# Java Rest API
+
+@Path("/items")
+public class ItemResource {
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Item> getItems() {
+        // Logic to get list of items
+        return itemService.getAllItems();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createItem(Item item) {
+        // Logic to save item
+        itemService.saveItem(item);
+        return Response.status(Response.Status.CREATED).entity(item).build();
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateItem(@PathParam("id") String id, Item item) {
+        // Logic to update item by id
+        itemService.updateItem(id, item);
+        return Response.ok(item).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deleteItem(@PathParam("id") String id) {
+        // Logic to delete item by id
+        itemService.deleteItem(id);
+        return Response.noContent().build();
+    }
+}
+
+# JAXB 
+
+@XmlRootElement(name = "book")
+public class Book {
+    private String title;
+    private String author;
+
+    @XmlElement(name = "title")
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @XmlElement(name = "author")
+    public String getAuthor() {
+        return author;
+    }
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+}
+
+// Marshaling: Java object to XML
+JAXBContext context = JAXBContext.newInstance(Book.class);
+Marshaller marshaller = context.createMarshaller();
+marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+Book book = new Book();
+book.setTitle("Java Basics");
+book.setAuthor("John Doe");
+
+marshaller.marshal(book, System.out);
+
+// Unmarshaling: XML to Java object
+Unmarshaller unmarshaller = context.createUnmarshaller();
+Book unmarshalledBook = (Book) unmarshaller.unmarshal(new File("book.xml"));
