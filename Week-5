@@ -1,0 +1,130 @@
+#Handling Request & Response 
+# server.js
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+// GET – fetch data
+app.get('/', (req, res) => {
+  res.send('GET request: Welcome to HTTP Handling Example!');
+});
+
+// POST – send data to server
+app.post('/submit', (req, res) => {
+  const data = req.body;
+  res.send(`POST request received! Data: ${JSON.stringify(data)}`);
+});
+
+// PUT – update data
+app.put('/update', (req, res) => {
+  const data = req.body;
+  res.send(`PUT request: Data updated successfully! ${JSON.stringify(data)}`);
+});
+
+// DELETE – remove data
+app.delete('/delete', (req, res) => {
+  res.send('DELETE request: Data deleted successfully!');
+});
+
+const PORT = 3001;
+app.listen(PORT, () => console.log(`HTTP server running at http://localhost:${PORT}`));
+
+#Nodemailer 
+# sendmail.js
+const nodemailer = require('nodemailer');
+
+// Step 1: Create transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'your_email@gmail.com',        // Replace with your email
+    pass: 'your_app_password'            // Use app-specific password
+  }
+});
+
+// Step 2: Define mail options
+const mailOptions = {
+  from: 'your_email@gmail.com',
+  to: 'receiver@example.com',
+  subject: 'Test Email from Node.js',
+  text: 'Hello! This is a test email using Nodemailer.'
+};
+
+// Step 3: Send mail
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) return console.error(error);
+  console.log('Email sent successfully:', info.response);
+});
+
+# Session Management 
+# sessionManagement.js
+
+const express = require('express');
+const session = require('express-session');
+const app = express();
+
+app.use(session({
+  secret: '7332',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}));
+
+app.get('/', (req, res) => {
+  req.session.visitCount = (req.session.visitCount || 0) + 1;
+  res.send(`Visits: ${req.session.visitCount}`);
+});
+
+app.listen(3005, () => {
+  console.log('Session server running at http://localhost:3005');
+});
+
+#JWT Authorization
+#jwtAuthorization
+
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
+
+const app = express();
+const PORT = 3007;
+const SECRET_KEY = 'jwt.example.chapter17';
+
+app.use(bodyParser.json());
+
+// Step 1: Mock user data
+const users = [{ id: 1, username: 'testUser1', password: 'password' }];
+
+// Step 2: Login and generate token
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+
+  if (user) {
+    const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
+    return res.json({ token });
+  }
+  res.status(401).send('Invalid credentials');
+});
+
+// Step 3: Middleware to verify token
+const authenticateJWT = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (token) {
+    jwt.verify(token, SECRET_KEY, (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user;
+      next();
+    });
+  } else {
+    res.sendStatus(401);
+  }
+};
+
+// Step 4: Protected route
+app.get('/protected', authenticateJWT, (req, res) => {
+  res.send('Access granted! You are authorized.');
+});
+
+// Step 5: Start server
+app.listen(PORT, () => console.log(`JWT server running at http://localhost:${PORT}`));
