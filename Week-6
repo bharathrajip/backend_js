@@ -1,0 +1,32 @@
+#Asynchronus file system 
+// Node.js file system module தொடர்பான Asynchronous file write உதாரணம்
+const fs = require('fs');
+
+const asyncWriteExample = 'Data is written to this file in asynchronous mode using callbacks.';
+
+fs.writeFile('testasyncWriteExample.txt', asyncWriteExample, (err) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log('File write operation was successful.');
+  }
+});
+
+#middleware
+const express = require('express');
+const app = express();
+
+app.use(express.json()); // JSON parsing middleware
+
+app.get('/users', (req, res) => {
+  res.send('GET request to /users');
+});
+
+app.post('/users', (req, res) => {
+  // Process POST request
+  res.send('POST request to /users');
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
