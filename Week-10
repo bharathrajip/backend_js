@@ -1,0 +1,28 @@
+# database connection 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/mydb', { useNewUrlParser: true, useUnifiedTopology: true });
+
+const schema = new mongoose.Schema({
+  name: { type: String, required: true },
+  age: Number,
+  email: { type: String, required: true, unique: true }
+}, { timestamps: true });
+
+const User = mongoose.model('User', schema);
+
+async function createUser() {
+  const user = new User({ name: 'John Doe', age: 30, email: 'john@example.com' });
+  await user.save();
+}
+
+async function updateUser(id) {
+  await User.updateOne({ _id: id }, { age: 31 });
+}
+
+async function findUser(id) {
+  return await User.findById(id);
+}
+
+async function deleteUser(id) {
+  await User.deleteOne({ _id: id });
+}
